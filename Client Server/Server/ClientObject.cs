@@ -1,41 +1,22 @@
-﻿using System;
+using System;
 using System.Net.Sockets;
 using System.Text;
 
-namespace ChatServer
+
+namespace PrivateChat
 {
     public class ClientObject
     {
-        /// <summary>
-        /// Id is uniqy for Client
-        /// </summary>
+     
         protected internal string Id { get; private set; }
 
-        /// <summary>
-        /// Which stream connect client
-        /// </summary>
         protected internal NetworkStream Stream { get; private set; }
 
-        /// <summary>
-        /// Name of user
-        /// </summary>
         string userName;
-        
-        /// <summary>
-        /// TCP network connections
-        /// </summary>
+
         TcpClient client;
 
-        /// <summary>
-        /// Server objcet who connected
-        /// </summary>
-        ServerObject server; 
-
-        /// <summary>
-        /// ClientObject .contr
-        /// </summary>
-        /// <param name="tcpClient">TCP network </param>
-        /// <param name="serverObject">Server</param>
+        ServerObject server;
         public ClientObject(TcpClient tcpClient, ServerObject serverObject)
         {
             Id = Guid.NewGuid().ToString();
@@ -44,23 +25,20 @@ namespace ChatServer
             serverObject.AddConnection(this);
         }
 
-        /// <summary>
-        /// Which will do when connect to server (server creat thread and runing the method Process)
-        /// </summary>
         public void Process()
         {
             try
             {
                 Stream = client.GetStream();
-                // set user name
+      
                 string message = GetMessage();
                 userName = message;
 
                 message = userName + " Entered chat";
-                //send message all users (to server too)
+                
                 server.BroadcastMessage(message, this.Id);
                 Console.WriteLine(message);
-                // infinity loop get message for users
+
                 while (true)
                 {
                     try
@@ -85,16 +63,10 @@ namespace ChatServer
             }
             finally
             {
-                // server out loop ending
                 server.RemoveConnection(this.Id);
                 Close();
             }
         }
-
-        /// <summary>
-        /// Geting Message to users
-        /// </summary>
-        /// <returns>Message</returns>
         private string GetMessage()
         {
             byte[] data = new byte[64];
@@ -109,10 +81,6 @@ namespace ChatServer
 
             return builder.ToString();
         }
-
-        /// <summary>
-        /// Close network
-        /// </summary>
         protected internal void Close()
         {
             if (Stream != null)
