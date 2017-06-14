@@ -1,18 +1,12 @@
-﻿using System;
+using System;
 using System.Threading;
 
-namespace ChatServer
+namespace PrivateChat
 {
     class Program
     {
-        /// <summary>
-        /// Server
-        /// </summary>
         static ServerObject server;
 
-        /// <summary>
-        /// Thread for listening
-        /// </summary>
         static Thread listenThread;
         static void Main(string[] args)
         {
@@ -20,7 +14,7 @@ namespace ChatServer
             {
                 server = new ServerObject();
                 listenThread = new Thread(new ThreadStart(server.Listen));
-                listenThread.Start(); //start thread
+                listenThread.Start();
             }
             catch (Exception ex)
             {
@@ -30,4 +24,3 @@ namespace ChatServer
         }
     }
 }
-
