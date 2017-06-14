@@ -1,32 +1,36 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Net.Sockets;
 using System.Text;
+using System.Net;
 
 namespace ChatClient
 {
     class Program
     {
         static string userName;
-        private const string host = "192.168.0.101";
+        public static  string host;
         private const int port = 8888;
         static TcpClient client;
         static NetworkStream stream;
-
+        
         static void Main(string[] args)
         {
+            Console.WriteLine("Enter local host...for example 192.168.0.1");
+            host = Console.ReadLine();
+
             Console.Write("Enter your name: ");
             userName = Console.ReadLine();
             client = new TcpClient();
             try
             {
-                client.Connect(host, port); 
+                client.Connect(host, port);
                 stream = client.GetStream();
 
                 string message = userName;
                 byte[] data = Encoding.Unicode.GetBytes(message);
                 stream.Write(data, 0, data.Length);
-                
+
                 Thread receiveThread = new Thread(new ThreadStart(ReceiveMessage));
                 receiveThread.Start();
                 Console.WriteLine("Welcome, {0}", userName);
@@ -41,9 +45,6 @@ namespace ChatClient
                 Disconnect();
             }
         }
-        /// <summary>
-        /// Sending messages
-        /// </summary>
         static void SendMessage()
         {
             Console.WriteLine("Enter your message: ");
@@ -55,16 +56,13 @@ namespace ChatClient
                 stream.Write(data, 0, data.Length);
             }
         }
-        /// <summary>
-        /// Receiving messages
-        /// </summary>
         static void ReceiveMessage()
         {
             while (true)
             {
                 try
                 {
-                    byte[] data = new byte[64]; 
+                    byte[] data = new byte[64];
                     StringBuilder builder = new StringBuilder();
                     int bytes = 0;
                     do
@@ -79,7 +77,7 @@ namespace ChatClient
                 }
                 catch
                 {
-                    Console.WriteLine("Connection aborted!"); 
+                    Console.WriteLine("Connection aborted!");
                     Console.ReadLine();
                     Disconnect();
                 }
